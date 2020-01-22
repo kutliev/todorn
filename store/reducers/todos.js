@@ -1,4 +1,5 @@
 import { ADD_TODO, TOGGLE_TODO, REMOVE_TODO } from '../actionTypes';
+import apiService from '../api';
 
 const initialState = {
   ids: [],
@@ -11,43 +12,77 @@ const todos = (state = initialState, action) => {
       const { content } = action.payload;
       const id = Math.round(Math.random() * 10000);
 
-      return {
-        ...state,
-        ids: [...state.ids, id],
-        todos: {
-          ...state.todos,
-          [id]: {
-            content,
-            completed: false,
+      console.log('***ADD TODO');
+      console.log(apiService);
+
+      apiService
+        .addTodo(content)
+        .then(response => {
+          return {
+            ...state,
+            ids: [...state.ids, id],
+            todos: {
+              ...state.todos,
+              [id]: {
+                content,
+                completed: false,
+              }
+            }
           }
-        }
-      }
+        })
+        .catch(error => {
+          console.log('***ADD TODO ERROR');
+          console.log(error);
+        });
+
+      return state;
     }
     case TOGGLE_TODO: {
       const { id } = action.payload;
 
-      return {
-        ...state,
-        ids: [...state.ids],
-        todos: {
-          ...state.todos,
-          [id]: {
-            ...state.todos[id],
-            completed: !state.todos[id].completed,
-          }
-        }
-      };
+      apiService
+        .toggleTodo(id)
+        .then(response => {
+          return {
+            ...state,
+            ids: [...state.ids],
+            todos: {
+              ...state.todos,
+              [id]: {
+                ...state.todos[id],
+                completed: !state.todos[id].completed,
+              }
+            }
+          };
+        })
+        .catch(error => {
+          console.log('***TOGGLE TODO ERROR');
+          console.log(error);
+        });
+
+      return state;
     }
     case REMOVE_TODO: {
       const { id } = action.payload;
-      return {
-        ...state,
-        ids: state.ids.filter(todoId => todoId != id),
-        todos: {
-          ...state.todos,
-          [id]: null,
-        }
-      }
+
+      apiService
+        .removeTodo(id)
+        .then(response => {
+          return {
+            ...state,
+            ids: state.ids.filter(todoId => todoId != id),
+            todos: {
+              ...state.todos,
+              [id]: null,
+            }
+          }
+        })
+        .catch(error => {
+          console.log('***REMOVE TODO ERROR');
+          console.log(error);
+        });
+      
+      return state;
     }
     default:
       return state;

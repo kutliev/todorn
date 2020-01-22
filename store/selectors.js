@@ -3,9 +3,6 @@ export const isLoggedIn = store => store.account.isLoggedIn;
 export const getUserName = store => store.account.userName;
 
 export const getTodoList = store => {
-  console.log('***STORE');
-  console.log(store);
-
   return store.todos
     ? store.todos.ids
     : [];
